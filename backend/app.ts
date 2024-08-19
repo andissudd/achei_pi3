@@ -2,11 +2,12 @@ import "reflect-metadata";
 import { AppDataSource } from "./data-source";
 import { User } from "./entities/User";
 import { Repository } from "typeorm";
-
+//
 import express from "express";
 import path from 'path';
-import { engine } from 'express-handlebars'
-
+import { engine } from 'express-handlebars';
+//routes
+//import { router as userRouter} from './routes/users';
 //
 const app = express();
 // app.use(express.json());
@@ -26,7 +27,12 @@ async function main() {
   let passwordRegex = new RegExp(`^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$`);
   let error:String|null = null;
 
-  // app.get("/", (req, res) => res.redirect("/users"));
+  app.get('/', function(req, res) {
+    res.render('index', {
+        layout : 'main',
+        pageTitle: 'Achei!'
+    });
+  });
 
   //show all users
   app.get("/users", async (req, res) => {
