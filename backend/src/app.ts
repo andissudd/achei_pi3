@@ -8,13 +8,11 @@ import { engine } from 'express-handlebars';
 //
 const app = express();
 app.use(express.json());
-app.use('/', authRoutes)
-app.use('users', userRoute);
 //
 app.engine('hbs', engine({
   extname: '.hbs'
 }));
-app.use(express.static('./public/'));
+app.use(express.static('./src/public'));
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, './views'));
 //
@@ -38,7 +36,7 @@ async function main() {
       });
     });
 
-    app.get('/register', function(req, res) {
+    app.get('/item-register', function(req, res) {
       res.render('item_register', {
           layout : 'main',
           pageTitle: 'Achei! | Cadastrar item'
@@ -52,17 +50,17 @@ async function main() {
       });
     });
 
-    app.get('/itemDetails', function(req, res) {
+    app.get('/item-details', function(req, res) {
       res.render('item_details', {
           layout : 'main',
           pageTitle: 'Achei! | Item'
       });
     });
 
-    app.get('/booking', function(req, res) {
+    app.get('/booking_confirm', function(req, res) {
       res.render('booking', {
           layout : 'main',
-          pageTitle: 'Achei! | Agendamento'
+          pageTitle: 'Achei! | Agendamento confirmado'
       });
     });
 
