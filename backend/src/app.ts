@@ -44,7 +44,7 @@ async function main() {
     });
 
     app.get('/search', function(req, res) {
-      res.render('item_register', {
+      res.render('search', {
           layout : 'main',
           pageTitle: 'Achei! | Pesquisar'
       });
