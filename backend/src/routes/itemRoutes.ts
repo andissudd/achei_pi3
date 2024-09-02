@@ -28,7 +28,7 @@ const router = Router();
 //show all items 
 router.get("/", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
-  const items = await itemRepository.find({ where: {state: true}, relations: ["user_found"]});
+  const items = await itemRepository.find({ where: {state: true}});
   res.status(200).json({
     data: items,
   });
@@ -94,23 +94,20 @@ router.post("/", authenticationJWT, async (req, res) => {
     user_recovered: null,
   };
 
-  console.log(token1);
-  console.log(token1.userId);
-  console.log(userFound);
+  await itemRepository.save(newItem);
+  res.status(201).json({
+    data: newItem,
+  });
 
-  // await itemRepository.save(newItem);
-  // res.status(201).json({
-  //   data: newItem,
-  // });
 });
 
 //update specific item
-router.put("/:code", async (req, res) => {
+router.put("/:code",authenticationJWT, async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
   // const roleRepository = AppDataSource.getRepository(Role);
 
   const itemCode = req.params.code;
-  const { username, email, password, role } = req.body;
+  const { name, category, color, size, desc } = req.body;
 
   let itemToUpdate = await itemRepository.findOne({
     where: { code: itemCode }
@@ -126,10 +123,19 @@ router.put("/:code", async (req, res) => {
     // inputValidation(name, category, color, size, desc);
     if (!error) {
       const newData = {
+        id: itemToUpdate.id,
         code: itemCode,
-        username: username,
-        email: email,
-        password: password
+        name: name,
+        state: true,
+        category: category,
+        color: color,
+        size: size,
+        desc: desc,
+        date_created: itemToUpdate.date_created,
+        date_recovered: itemToUpdate.date_created,
+        user_found: itemToUpdate.user_found,
+        user_recovered: itemToUpdate.user_recovered,
+        photos: itemToUpdate.photos,
       };
 
       await itemRepository.save(newData);
@@ -140,12 +146,12 @@ router.put("/:code", async (req, res) => {
       res.status(400).json({ error });
     }
   } else {
-    res.status(404).json({ erro: "Usuário não encontrado." });
+    res.status(404).json({ erro: "Item não encontrado." });
   }
 });
 
 //delete specific item
-router.delete("/:code", async (req, res) => {
+router.delete("/:code", authenticationJWT, async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
   const itemCode = req.params.code;
   const itemToRemove = await itemRepository.findOneBy({ code: itemCode });

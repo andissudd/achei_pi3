@@ -33,6 +33,9 @@ export class Item {
     @Column({ type: 'date', nullable: true})
     date_revovered: Date | null;
 
+    // @ManyToOne( ()=> User, user => user.found_items)
+    // user_found: User["id"]; 
+
     @ManyToOne( ()=> User, user => user.found_items)
     user_found: User; 
 
