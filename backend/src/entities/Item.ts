@@ -1,7 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
-import { Category } from "./Category"
-import { Color } from "./Color"
-import { Size } from "./Size"
 import { User } from "./User"
 
 @Entity ()
@@ -18,14 +15,14 @@ export class Item {
     @Column()
     state: boolean;
 
-    @ManyToOne( ()=> Category, category => category.items)
-    category: Category;
+    @Column()
+    category: string;
 
-    @ManyToOne( ()=> Color, color => color.items)
-    color: Color;
+    @Column()
+    color: string;
 
-    @ManyToOne( ()=> Size, size => size.items)
-    size: Size;
+    @Column()
+    size: string;
     
     @Column()
     desc: string;
@@ -33,19 +30,17 @@ export class Item {
     @Column({ type:'date'})
     date_created: Date;
 
-    @Column({ type: 'date', nullable: true })
+    @Column({ type: 'date', nullable: true})
     date_revovered: Date | null;
-    
-    @OneToOne( ()=> User)
-    @JoinColumn()
-    student_found: User; 
 
-    @OneToOne( ()=> User)
-    @JoinColumn()
-    student_recovered: User | null; 
+    @ManyToOne( ()=> User, user => user.found_items)
+    user_found: User; 
+
+    @ManyToOne( ()=> User, user => user.recovered_items)
+    user_recovered: User | null; 
     
-    // @Column({ type: 'blob'})
-    // photos: Blob[];
+    @Column({ type: 'blob', nullable: true})
+    photos: Blob[];
 
 };
 

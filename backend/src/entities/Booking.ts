@@ -10,10 +10,10 @@ export class Booking {
     @Column()
     state: boolean; 
     
-    @Column({ type: 'datetime' })
+    @Column({ type: 'date' })
     date_booked: Date;
 
-    @Column({ type: 'datetime', nullable: true })
+    @Column({ type: 'date', nullable: true })
     date_concluded: Date; 
 
     @OneToOne( ()=> Item, item => item.category)

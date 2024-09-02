@@ -1,9 +1,7 @@
 import Router from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entities/User";
-import { Category } from "../entities/Category";
-import { Color } from "../entities/Color";
-import { Size } from "../entities/Size";
+
 
 import { Item } from "../entities/Item";
 import { authenticationJWT } from "../middleware/authMiddleware";
@@ -30,7 +28,7 @@ const router = Router();
 //show all items 
 router.get("/", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
-  const items = await itemRepository.find({ where: {state: true} });
+  const items = await itemRepository.find({ where: {state: true}, relations: ["user_found"]});
   res.status(200).json({
     data: items,
   });
@@ -58,24 +56,21 @@ router.get("/:code", async (req, res) => {
 router.post("/", authenticationJWT, async (req, res) => {
 
   const itemRepository = AppDataSource.getRepository(Item); 
-  const categoryRepository = AppDataSource.getRepository(Category); 
-  const colorRepository = AppDataSource.getRepository(Color); 
-  const sizeRepository = AppDataSource.getRepository(Size); 
   const userRepository = AppDataSource.getRepository(User); 
   //create new code
   const items = await itemRepository.find();
-  const newCode = `Item: ${items.length}`
+  const newCode = `item${items.length}`
   //get user data
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   const arrayToken = token && token.split('.');
   const token1 = arrayToken && JSON.parse(atob(arrayToken[1]));
-  const userId = token1.user;
-  const studentFound = await userRepository.findOne({
+  const userId = token1.userId;
+  const userFound = await userRepository.findOne({
     where: { id: userId },
     relations: ["role"],
   });
-  if (!studentFound) {
+  if (!userFound) {
     error = "Usuário não encontrado.";
     res.status(400).json({ error });
     return;
@@ -83,45 +78,30 @@ router.post("/", authenticationJWT, async (req, res) => {
   //
   const { name, category, color, size, desc } = req.body;
   inputValidation(name, category, color, size, desc);
-  //check category
-  let categoryInDb = await categoryRepository.findOne({ where: { name: category } });
-  if (!categoryInDb) {
-    categoryInDb = categoryRepository.create({ name: category });
-    await categoryRepository.save(categoryInDb);
-  }
-  //check color
-  let colorInDb = await colorRepository.findOne({ where: { name: color } });
-  if (!colorInDb) {
-    colorInDb = colorRepository.create({ name: color });
-    await colorRepository.save(colorInDb);
-  }
-  //check category
-  let sizeInDb = await sizeRepository.findOne({ where: { name: size } });
-  if (!sizeInDb) {
-    sizeInDb = sizeRepository.create({ name: category });
-    await sizeRepository.save(categoryInDb);
-  }
+  
 
   const newItem = {
     code: newCode,
     name: name,
     state: true,
-    category: categoryInDb,
-    color: colorInDb,
-    size: sizeInDb,
+    category: category,
+    color: color,
+    size: size,
     desc: desc,
     date_created: new Date(),
     date_recovered: null,
-    student_found: studentFound,
-    student_recovered: null,
+    user_found: userFound,
+    user_recovered: null,
   };
 
-  console.log(newItem);
+  console.log(token1);
+  console.log(token1.userId);
+  console.log(userFound);
 
-  await itemRepository.save(newItem);
-  res.status(201).json({
-    data: newItem,
-  });
+  // await itemRepository.save(newItem);
+  // res.status(201).json({
+  //   data: newItem,
+  // });
 });
 
 //update specific item
@@ -165,16 +145,16 @@ router.put("/:code", async (req, res) => {
 });
 
 //delete specific item
-router.delete("/:id", async (req, res) => {
-  const itemRepository = AppDataSource.getRepository(User);
-  const userId = parseInt(req.params.id);
-  const userToRemove = await itemRepository.findOneBy({ id: userId });
+router.delete("/:code", async (req, res) => {
+  const itemRepository = AppDataSource.getRepository(Item);
+  const itemCode = req.params.code;
+  const itemToRemove = await itemRepository.findOneBy({ code: itemCode });
 
-  if (userToRemove) {
-    console.log(userToRemove);
-    await itemRepository.remove(userToRemove);
+  if (itemToRemove) {
+    console.log(itemToRemove);
+    await itemRepository.remove(itemToRemove);
     res.status(200).json({
-      data: userToRemove,
+      data: itemToRemove,
     });
   } else {
     error = "Usuário não encontrado.";
