@@ -29,4 +29,4 @@ try {
         message: 'Invalid token'
     })
    
-}}
+}};

@@ -1,7 +1,10 @@
 import Router from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entities/User";
-import { Role } from "../entities/Role";
+import { Category } from "../entities/Category";
+import { Color } from "../entities/Color";
+import { Size } from "../entities/Size";
+
 import { Item } from "../entities/Item";
 import { authenticationJWT } from "../middleware/authMiddleware";
 import bcrypt from "bcryptjs";
@@ -9,26 +12,13 @@ import bcrypt from "bcryptjs";
 let error: String | null = null;
 
 function inputValidation(
-  username: string,
-  email: string,
-  password: string,
-  role: string
+  name: string,
+  category: string,
+  color: string,
+  size: string,
+  desc: string,
 ) {
-  if (username && email && password && role) {
-    const emailRegex = new RegExp("^[a-z0-9.]+@[a-z0-9]+.[a-z]+.([a-z]+)?$");
-    const passwordRegex = new RegExp(
-      `^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$`
-    );
-
-    if (username.length < 5) {
-      return (error = "Nome de usuário deve ter pelo menos 5 caracteres.");
-    } else if (!emailRegex.exec(email)) {
-      return (error = "Email inválido.");
-    } else if (!passwordRegex.exec(password)) {
-      return (error =
-        "Senha inválida. Certifique-se de que a senha tenha pelo menos 8 caracteres, 1 número e 1 letra maiúscula.");
-    }
-  } else {
+  if (!name && !category && !color && !size && !desc) { 
     return (error = "Todos os campos devem ser preenchidos.");
   }
 }
@@ -37,21 +27,21 @@ const router = Router();
 
 // router.use(authenticationJWT);
 
-//show all item 
+//show all items 
 router.get("/", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
-  const items = await itemRepository.find({ relations: ["role"] });
+  const items = await itemRepository.find({ where: {state: true} });
   res.status(200).json({
     data: items,
   });
 });
 
-//show a user
-router.get("/:id", async (req, res) => {
+//show item details
+router.get("/:code", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
-  const itemId = parseInt(req.params.id);
+  const itemCode = req.params.code;
   const item = await itemRepository.findOne({
-    where: { id: itemId }
+    where: { code: itemCode }
   });
 
   if (item) {
@@ -65,34 +55,68 @@ router.get("/:id", async (req, res) => {
 });
 
 //add a item
-router.post("/", async (req, res) => {
-  const { name, category, desc, student_found, photos} = req.body;
+router.post("/", authenticationJWT, async (req, res) => {
 
-  const itemRepository = AppDataSource.getRepository(Item);
-  // const roleRepository = AppDataSource.getRepository(Role);
-
-  // let roleInDb = await roleRepository.findOne({ where: { name: role } });
-  // if (!roleInDb) {
-  //   roleInDb = roleRepository.create({ name: role });
-  //   await roleRepository.save(roleInDb);
-  // }
-
-  // inputValidation(username, email, password, role);
-  // if (!roleInDb) {
-  //   roleInDb = roleRepository.create({ name: role });
-  //   await roleRepository.save(roleInDb);
-  // }
+  const itemRepository = AppDataSource.getRepository(Item); 
+  const categoryRepository = AppDataSource.getRepository(Category); 
+  const colorRepository = AppDataSource.getRepository(Color); 
+  const sizeRepository = AppDataSource.getRepository(Size); 
+  const userRepository = AppDataSource.getRepository(User); 
+  //create new code
+  const items = await itemRepository.find();
+  const newCode = `Item: ${items.length}`
+  //get user data
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  const arrayToken = token && token.split('.');
+  const token1 = arrayToken && JSON.parse(atob(arrayToken[1]));
+  const userId = token1.user;
+  const studentFound = await userRepository.findOne({
+    where: { id: userId },
+    relations: ["role"],
+  });
+  if (!studentFound) {
+    error = "Usuário não encontrado.";
+    res.status(400).json({ error });
+    return;
+  }
+  //
+  const { name, category, color, size, desc } = req.body;
+  inputValidation(name, category, color, size, desc);
+  //check category
+  let categoryInDb = await categoryRepository.findOne({ where: { name: category } });
+  if (!categoryInDb) {
+    categoryInDb = categoryRepository.create({ name: category });
+    await categoryRepository.save(categoryInDb);
+  }
+  //check color
+  let colorInDb = await colorRepository.findOne({ where: { name: color } });
+  if (!colorInDb) {
+    colorInDb = colorRepository.create({ name: color });
+    await colorRepository.save(colorInDb);
+  }
+  //check category
+  let sizeInDb = await sizeRepository.findOne({ where: { name: size } });
+  if (!sizeInDb) {
+    sizeInDb = sizeRepository.create({ name: category });
+    await sizeRepository.save(categoryInDb);
+  }
 
   const newItem = {
-    // name: name,
-    // state: true,
-    // category: category,
-    // desc: desc,
-    // date_created: new Date(),
-    // date_revovered: null,
-    // student_found: student_found,
-    // student_recovered: null,
+    code: newCode,
+    name: name,
+    state: true,
+    category: categoryInDb,
+    color: colorInDb,
+    size: sizeInDb,
+    desc: desc,
+    date_created: new Date(),
+    date_recovered: null,
+    student_found: studentFound,
+    student_recovered: null,
   };
+
+  console.log(newItem);
 
   await itemRepository.save(newItem);
   res.status(201).json({
@@ -100,34 +124,32 @@ router.post("/", async (req, res) => {
   });
 });
 
-//update specific user
-router.put("/:id", async (req, res) => {
-  const itemRepository = AppDataSource.getRepository(User);
-  const roleRepository = AppDataSource.getRepository(Role);
+//update specific item
+router.put("/:code", async (req, res) => {
+  const itemRepository = AppDataSource.getRepository(Item);
+  // const roleRepository = AppDataSource.getRepository(Role);
 
-  const userId = parseInt(req.params.id);
+  const itemCode = req.params.code;
   const { username, email, password, role } = req.body;
 
-  let userToUpdate = await itemRepository.findOne({
-    where: { id: userId },
-    relations: ["role"],
+  let itemToUpdate = await itemRepository.findOne({
+    where: { code: itemCode }
   });
 
-  let roleInDb = await roleRepository.findOne({ where: { name: role } });
-  if (!roleInDb) {
-    roleInDb = roleRepository.create({ name: role });
-    await roleRepository.save(roleInDb);
-  }
+  // let roleInDb = await roleRepository.findOne({ where: { name: role } });
+  // if (!roleInDb) {
+  //   roleInDb = roleRepository.create({ name: role });
+  //   await roleRepository.save(roleInDb);
+  // }
 
-  if (userToUpdate) {
-    inputValidation(username, email, password, role);
+  if (itemToUpdate) {
+    // inputValidation(name, category, color, size, desc);
     if (!error) {
       const newData = {
-        id: userId,
+        code: itemCode,
         username: username,
         email: email,
-        password: password,
-        role: roleInDb,
+        password: password
       };
 
       await itemRepository.save(newData);
@@ -142,7 +164,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-//delete specific user
+//delete specific item
 router.delete("/:id", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(User);
   const userId = parseInt(req.params.id);

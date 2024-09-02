@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import express from "express";
-import userRoute from './routes/userRoutes'
+import userRoutes from './routes/userRoutes'
+import itemRoutes from './routes/itemRoutes'
 import authRoutes  from './routes/authRoutes'
 import { AppDataSource } from "./database/data-source";
 import path from 'path';
@@ -72,7 +73,8 @@ async function main() {
     });
     //
     app.use('/', authRoutes);
-    app.use('/users', userRoute);
+    app.use('/users', userRoutes);
+    app.use('/items', itemRoutes);
 
     //Start server
     const port = 8000;
