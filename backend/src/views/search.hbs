@@ -1,14 +1,43 @@
 <div class="search-page-container">
     <div>
         <div>
+            <div>
+            <form class="pesquisar">
+                <input class="pesquisa" type="text" placeholder="Search.." name="search">
+                 <button type="submit"><i class="search"></i></button>
+            </form>
+
+        </div>
+      
+        <div class="Category">
             <form>
                 <label for="">Categoria:</label><br>
-                <select id="category-select">
+
+                <label class="container">Documento
+                <input type="checkbox" checked="checked">
+                <span class="checkmark"></span>
+                </label>
+
+                <label class="container">Bolsa
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                </label>
+
+                <label class="container">Estojo
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                </label>
+                <label class="container">Garrafa
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                </label>
+                
+             <!--   <select id="category-select">
                     <option value="">Todos</option>
                     <option value="1">Categoría 1</option>
                     <option value="2">Categoría 2</option>
                     <option value="3">Categoría 3</option>
-                </select><br>
+                </select><br> -->
 
                 <label for="">Perdido entre:</label><br>
                 <input type="date" id="start-date" name="start-date"><br>
@@ -23,24 +52,16 @@
                     <option value="3">Verde</option>
                 </select><br>
 
-                <label for="">Cor:</label><br>
+                <label for="">Tamanho:</label><br>
                 <select id="category-select">
-                    <option value="">Preto</option>
-                    <option value="1">Vermelho</option>
-                    <option value="2">Azul</option>
-                    <option value="3">Amarelo</option>
-                    <option value="3">Verde</option>
+                    <option value="">P</option>
+                    <option value="1">M</option>
+                    <option value="2">G</option>
+                   
                 </select><br>
+                <button class="filtrar" type="submit">Filtrar</button>
             </form>
         </div>
     </div>
-
-    <div>
-        <div>
-            <form>
-                <input type="text">
-                <input type="submit" value="Pesquisar">
-            </form>
-        </div>
-    </div>
+</div>
 </div>

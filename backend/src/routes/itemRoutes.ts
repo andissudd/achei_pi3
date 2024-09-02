@@ -1,17 +1,13 @@
-import express from "express";
 import Router from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entities/User";
-
+import { Category } from "../entities/Category";
+import { Color } from "../entities/Color";
+import { Size } from "../entities/Size";
 
 import { Item } from "../entities/Item";
 import { authenticationJWT } from "../middleware/authMiddleware";
 import bcrypt from "bcryptjs";
-
-
-import path from 'path';
-import { engine } from 'express-handlebars';
-
 
 let error: String | null = null;
 
@@ -30,18 +26,11 @@ function inputValidation(
 const router = Router();
 
 // router.use(authenticationJWT);
-//
-router.engine('hbs', engine({
-  extname: '.hbs'
-}));
-router.use(express.static('./src/public'));
-router.set('view engine', '.hbs');
-router.set('views', path.join(__dirname, '../views'));
-//
+
 //show all items 
 router.get("/", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
-  const items = await itemRepository.find({ where: {state: true}});
+  const items = await itemRepository.find({ where: {state: true} });
   res.status(200).json({
     data: items,
   });
@@ -56,18 +45,12 @@ router.get("/:code", async (req, res) => {
   });
 
   if (item) {
-    res.status(200).render('item_details', {
-          layout : 'main',
-          pageTitle: `Achei! | ${item.name}`,
-          item: item,
-      });
+    res.status(200).json({
+      data: item
+    });
   } else {
     error = "Item não encontrado.";
-    res.status(400).render('item_details', {
-      layout : 'main',
-      pageTitle: `Achei! | Item não encontrado`,
-      item: false,
-  });
+    res.status(400).json({ error });
   }
 });
 
@@ -75,21 +58,24 @@ router.get("/:code", async (req, res) => {
 router.post("/", authenticationJWT, async (req, res) => {
 
   const itemRepository = AppDataSource.getRepository(Item); 
+  const categoryRepository = AppDataSource.getRepository(Category); 
+  const colorRepository = AppDataSource.getRepository(Color); 
+  const sizeRepository = AppDataSource.getRepository(Size); 
   const userRepository = AppDataSource.getRepository(User); 
   //create new code
   const items = await itemRepository.find();
-  const newCode = `item${items.length}`
+  const newCode = `Item: ${items.length}`
   //get user data
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   const arrayToken = token && token.split('.');
   const token1 = arrayToken && JSON.parse(atob(arrayToken[1]));
-  const userId = token1.userId;
-  const userFound = await userRepository.findOne({
+  const userId = token1.user;
+  const studentFound = await userRepository.findOne({
     where: { id: userId },
     relations: ["role"],
   });
-  if (!userFound) {
+  if (!studentFound) {
     error = "Usuário não encontrado.";
     res.status(400).json({ error });
     return;
@@ -97,36 +83,54 @@ router.post("/", authenticationJWT, async (req, res) => {
   //
   const { name, category, color, size, desc } = req.body;
   inputValidation(name, category, color, size, desc);
-  
+  //check category
+  let categoryInDb = await categoryRepository.findOne({ where: { name: category } });
+  if (!categoryInDb) {
+    categoryInDb = categoryRepository.create({ name: category });
+    await categoryRepository.save(categoryInDb);
+  }
+  //check color
+  let colorInDb = await colorRepository.findOne({ where: { name: color } });
+  if (!colorInDb) {
+    colorInDb = colorRepository.create({ name: color });
+    await colorRepository.save(colorInDb);
+  }
+  //check category
+  let sizeInDb = await sizeRepository.findOne({ where: { name: size } });
+  if (!sizeInDb) {
+    sizeInDb = sizeRepository.create({ name: category });
+    await sizeRepository.save(categoryInDb);
+  }
 
   const newItem = {
     code: newCode,
     name: name,
     state: true,
-    category: category,
-    color: color,
-    size: size,
+    category: categoryInDb,
+    color: colorInDb,
+    size: sizeInDb,
     desc: desc,
     date_created: new Date(),
     date_recovered: null,
-    user_found: userFound,
-    user_recovered: null,
+    student_found: studentFound,
+    student_recovered: null,
   };
+
+  console.log(newItem);
 
   await itemRepository.save(newItem);
   res.status(201).json({
     data: newItem,
   });
-
 });
 
 //update specific item
-router.put("/:code",authenticationJWT, async (req, res) => {
+router.put("/:code", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
   // const roleRepository = AppDataSource.getRepository(Role);
 
   const itemCode = req.params.code;
-  const { name, category, color, size, desc } = req.body;
+  const { username, email, password, role } = req.body;
 
   let itemToUpdate = await itemRepository.findOne({
     where: { code: itemCode }
@@ -142,19 +146,10 @@ router.put("/:code",authenticationJWT, async (req, res) => {
     // inputValidation(name, category, color, size, desc);
     if (!error) {
       const newData = {
-        id: itemToUpdate.id,
         code: itemCode,
-        name: name,
-        state: true,
-        category: category,
-        color: color,
-        size: size,
-        desc: desc,
-        date_created: itemToUpdate.date_created,
-        date_recovered: itemToUpdate.date_created,
-        user_found: itemToUpdate.user_found,
-        user_recovered: itemToUpdate.user_recovered,
-        photos: itemToUpdate.photos,
+        username: username,
+        email: email,
+        password: password
       };
 
       await itemRepository.save(newData);
@@ -165,21 +160,21 @@ router.put("/:code",authenticationJWT, async (req, res) => {
       res.status(400).json({ error });
     }
   } else {
-    res.status(404).json({ erro: "Item não encontrado." });
+    res.status(404).json({ erro: "Usuário não encontrado." });
   }
 });
 
 //delete specific item
-router.delete("/:code", authenticationJWT, async (req, res) => {
-  const itemRepository = AppDataSource.getRepository(Item);
-  const itemCode = req.params.code;
-  const itemToRemove = await itemRepository.findOneBy({ code: itemCode });
+router.delete("/:id", async (req, res) => {
+  const itemRepository = AppDataSource.getRepository(User);
+  const userId = parseInt(req.params.id);
+  const userToRemove = await itemRepository.findOneBy({ id: userId });
 
-  if (itemToRemove) {
-    console.log(itemToRemove);
-    await itemRepository.remove(itemToRemove);
+  if (userToRemove) {
+    console.log(userToRemove);
+    await itemRepository.remove(userToRemove);
     res.status(200).json({
-      data: itemToRemove,
+      data: userToRemove,
     });
   } else {
     error = "Usuário não encontrado.";
