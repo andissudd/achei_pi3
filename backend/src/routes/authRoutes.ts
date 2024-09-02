@@ -30,7 +30,7 @@ router.post("/login", async (req, res) => {
           jwt: token,
         },
       },
-    });
+    }).redirect('/');
   } else {
     res.status(401).json({
       status: 401,

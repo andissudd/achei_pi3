@@ -1,3 +1,4 @@
+import express from "express";
 import Router from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entities/User";
@@ -6,6 +7,11 @@ import { User } from "../entities/User";
 import { Item } from "../entities/Item";
 import { authenticationJWT } from "../middleware/authMiddleware";
 import bcrypt from "bcryptjs";
+
+
+import path from 'path';
+import { engine } from 'express-handlebars';
+
 
 let error: String | null = null;
 
@@ -24,7 +30,14 @@ function inputValidation(
 const router = Router();
 
 // router.use(authenticationJWT);
-
+//
+router.engine('hbs', engine({
+  extname: '.hbs'
+}));
+router.use(express.static('./src/public'));
+router.set('view engine', '.hbs');
+router.set('views', path.join(__dirname, '../views'));
+//
 //show all items 
 router.get("/", async (req, res) => {
   const itemRepository = AppDataSource.getRepository(Item);
@@ -43,12 +56,18 @@ router.get("/:code", async (req, res) => {
   });
 
   if (item) {
-    res.status(200).json({
-      data: item
-    });
+    res.status(200).render('item_details', {
+          layout : 'main',
+          pageTitle: `Achei! | ${item.name}`,
+          item: item,
+      });
   } else {
     error = "Item não encontrado.";
-    res.status(400).json({ error });
+    res.status(400).render('item_details', {
+      layout : 'main',
+      pageTitle: `Achei! | Item não encontrado`,
+      item: false,
+  });
   }
 });
 

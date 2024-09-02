@@ -1,25 +1,30 @@
 <div class="page-container">
 
-    <img src="/icons/triste.png">
-    <h1>Nome do item</h1>
-    <ul>
-        <li>
-            Categoria
-        </li>
-        <li>
-            Cor
-        </li>
-        <li>
-            Tamanho
-        </li>
-    </ul>
+    {{#if item}}
+        
+        <h1>{{item.name}}</h1>
+        <ul>
+            <li>
+                {{item.category}}
+            </li>
+            <li>
+                {{item.color}}
+            </li>
+            <li>
+                {{item.size}}
+            </li>
+        </ul>
 
-    <h4>Descrição</h4>
-    <p> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Totam voluptate omnis, sit nulla earum, modi expedita debitis itaque et blanditiis inventore sunt impedit quia perferendis quis tempore corporis sint tempora.</p>
-    <p>Encontrado por <span>Nome do Aluno</span></p>
-    
-    <form>
-        <input type="button" value="Agendar retirada">
-    </form>
+        <h4>Descrição</h4>
+        <p>{{item.desc}}</p>
+        <p>Encontrado por <span>{{item.user_found.name}}</span></p>
+        
+        <form>
+            <input type="button" value="Agendar retirada">
+        </form>
+    {{else}}
+        <img src="/icons/triste.png">
+        <h1>Item não encontrado</h1>
+    {{/if}}
 
 </div>

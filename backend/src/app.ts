@@ -51,13 +51,6 @@ async function main() {
       });
     });
 
-    app.get('/item-details', function(req, res) {
-      res.render('item_details', {
-          layout : 'main',
-          pageTitle: 'Achei! | Item'
-      });
-    });
-
     app.get('/booking_confirm', function(req, res) {
       res.render('booking', {
           layout : 'main',
@@ -66,7 +59,7 @@ async function main() {
     });
 
     app.get('/login', function(req, res) {
-      res.render('', {
+      res.render('login_form', {
           layout : 'login',
           pageTitle: 'Entrar'
       });
