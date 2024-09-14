@@ -7,12 +7,12 @@ import { User } from "../entities/User";
 const router = Router();
 
 router.post("/login", async (req, res) => {
-  const { email, password, username } = req.body;
+  const { password, register } = req.body;
 
   const userRepository = AppDataSource.getRepository(User);
-  const user = await userRepository.findOneBy({ username });
+  const user = await userRepository.findOneBy({ register });
 
-  if (user && email && bcrypt.compareSync(password, user.password)) {
+  if (user && bcrypt.compareSync(password, user.password)) {
     const token = jwt.sign(
       {
         userId: user.id,
@@ -30,7 +30,7 @@ router.post("/login", async (req, res) => {
           jwt: token,
         },
       },
-    }).redirect('/');
+    });
   } else {
     res.status(401).json({
       status: 401,

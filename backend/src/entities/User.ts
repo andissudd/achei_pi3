@@ -9,7 +9,10 @@ export class User {
     id!: number;
 
     @Column()
-    username!: string;
+    name!: string;
+
+    @Column()
+    register!: string;
     
     @Column()
     email!: string;

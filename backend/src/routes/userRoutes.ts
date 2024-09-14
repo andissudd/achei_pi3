@@ -8,18 +8,19 @@ import bcrypt from "bcryptjs";
 let error: String | null = null;
 
 function inputValidation(
-  username: string,
+  register: string,
+  name: string,
   email: string,
   password: string,
   role: string
 ) {
-  if (username && email && password && role) {
+  if (register && name && email && password && role) {
     const emailRegex = new RegExp("^[a-z0-9.]+@[a-z0-9]+.[a-z]+.([a-z]+)?$");
     const passwordRegex = new RegExp(
       `^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$`
     );
 
-    if (username.length < 5) {
+    if (name.length < 5) {
       return (error = "Nome de usuário deve ter pelo menos 5 caracteres.");
     } else if (!emailRegex.exec(email)) {
       return (error = "Email inválido.");
@@ -39,7 +40,7 @@ const router = Router();
 //show all users
 router.get("/", async (req, res) => {
   const userRepository = AppDataSource.getRepository(User);
-  const users = await userRepository.find({ relations: ["role"] });
+  const users = await userRepository.find( );
   res.status(200).json({
     data: users,
   });
@@ -65,8 +66,8 @@ router.get("/:id", async (req, res) => {
 });
 
 //add a user
-router.post("/", authenticationJWT, async (req, res) => {
-  const { username, email, password, role } = req.body;
+router.post("/", async (req, res) => {
+  const { register, name, email, password, role, } = req.body;
 
   const userRepository = AppDataSource.getRepository(User);
   const roleRepository = AppDataSource.getRepository(Role);
@@ -77,16 +78,13 @@ router.post("/", authenticationJWT, async (req, res) => {
     await roleRepository.save(roleInDb);
   }
 
-  inputValidation(username, email, password, role);
-  if (!roleInDb) {
-    roleInDb = roleRepository.create({ name: role });
-    await roleRepository.save(roleInDb);
-  }
+  inputValidation(register, name, email, password, role);
 
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   const newUser = {
-    username: username,
+    register: register,
+    name: name,
     email: email,
     password: hashedPassword,
     role: roleInDb,
@@ -104,7 +102,7 @@ router.put("/:id", authenticationJWT, async (req, res) => {
   const roleRepository = AppDataSource.getRepository(Role);
 
   const userId = parseInt(req.params.id);
-  const { username, email, password, role } = req.body;
+  const { register, name, email, password, role } = req.body;
 
   let userToUpdate = await userRepository.findOne({
     where: { id: userId },
@@ -118,11 +116,12 @@ router.put("/:id", authenticationJWT, async (req, res) => {
   }
 
   if (userToUpdate) {
-    inputValidation(username, email, password, role);
+    inputValidation(register, name, email, password, role);
     if (!error) {
       const newData = {
         id: userId,
-        username: username,
+        register: register,
+        name: name,
         email: email,
         password: password,
         role: roleInDb,

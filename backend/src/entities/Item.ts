@@ -1,5 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { User } from "./User"
+import { Category } from "./Category"
+import { Color } from "./Color"
+import { Size } from "./Size"
 
 @Entity ()
 export class Item {
@@ -33,17 +36,14 @@ export class Item {
     @Column({ type: 'date', nullable: true})
     date_revovered: Date | null;
 
-    // @ManyToOne( ()=> User, user => user.found_items)
-    // user_found: User["id"]; 
-
     @ManyToOne( ()=> User, user => user.found_items)
     user_found: User; 
 
     @ManyToOne( ()=> User, user => user.recovered_items)
     user_recovered: User | null; 
     
-    @Column({ type: 'blob', nullable: true})
-    photos: Blob[];
+    @Column({ type: 'blob'})
+    photo: Blob;
 
 };
 
