@@ -1,6 +1,20 @@
+<<<<<<< HEAD:frontend/src/App.vue
 <script setup lang="ts">
 
 </script>
+=======
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/index.css">
+    <link rel="stylesheet" href="./styles/nav-bar.css">
+    <link rel="stylesheet" href="./styles/search.css">
+    <link rel="stylesheet" href="./styles/item_details.css">
+    <link rel="stylesheet" href="./styles/item_register.css">
+>>>>>>> 4f3907aea89e38d7a03881aee6728b6e1ef33342:backend/src/views/layouts/main.hbs
 
 <template>
 
