@@ -5,31 +5,34 @@ import type { Item } from '../../types';
 import { categories, colors, sizes } from '../../types';
 
 const todayDate = new Date().toISOString().slice(0,10);
-
+//
 const item = ref({} as Item)
+//
 const name = ref('')
 const category = ref('')
 const size = ref('')
 const color = ref('')
 const date = ref(todayDate)
 const desc = ref('')
-const photo = ref(File)
 const error = ref<Error>()
 const success = ref(false)
-
-
+// 
 const hasPhoto = ref(false)
+const photoSelected = ref();
+
 
 function onPhotoSelected(){
     hasPhoto.value = !hasPhoto.value;
     const photoInput = <HTMLInputElement>document.getElementById('photo');
 
     const fakePhotoInput = <HTMLInputElement>document.getElementById('fakePhotoInput');
-    let photoSelected = photoInput.files && photoInput.files[0];
+    photoSelected.value = photoInput.files && photoInput.files[0];
     
     if (photoSelected){
+        let reader = new FileReader();
+        reader.readAsText
         fakePhotoInput.style.display = 'block';
-        fakePhotoInput.src = URL.createObjectURL(photoSelected);
+        fakePhotoInput.src = URL.createObjectURL(photoSelected.value);
     }
 };
 
@@ -39,7 +42,7 @@ function photoInputClick(){
         photoInput && photoInput.click();
     }
 
-    let photoSelected = photoInput.files && photoInput.files[0];
+    photoSelected.value = photoInput.files && photoInput.files[0];
 
     if (photoInput.files && photoInput.files[0] && hasPhoto.value == true){
         const fakePhotoInput = <HTMLInputElement>document.getElementById('fakePhotoInput');
@@ -51,8 +54,6 @@ function photoInputClick(){
     }
 }
 
-
-
 async function createItem(){
 try {
 
@@ -63,7 +64,12 @@ try {
         size: size.value,
         desc: desc.value,
         date_found: date.value,
-        photo: photo
+        photo: photoSelected.value
+    }, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+
     } );
     item.value = res.data.data;
     success.value = true;

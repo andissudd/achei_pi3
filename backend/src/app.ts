@@ -6,6 +6,7 @@ import cors from "cors";
 import userRoutes from './routes/userRoutes'
 import itemRoutes from './routes/itemRoutes'
 import authRoutes  from './routes/authRoutes'
+import bookingRoutes  from './routes/bookingRoutes'
 
 import { AppDataSource } from "./database/data-source";
 
@@ -25,6 +26,7 @@ async function main() {
     app.use('/', authRoutes);
     app.use('/users', userRoutes);
     app.use('/items', itemRoutes);
+    app.use('/bookings', bookingRoutes);
 
     //Start server
     const port = 7000;

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne     } from "typeorm";
 import { Item } from "./Item";
 import { User } from "./User";
 
@@ -9,18 +9,22 @@ export class Booking {
 
     @Column()
     state: boolean; 
+
+    @Column()
+    code: string; 
     
     @Column({ type: 'date' })
     date_booked: Date;
 
     @Column({ type: 'date', nullable: true })
-    date_concluded: Date; 
+    date_concluded: Date | null; 
 
-    @OneToOne( ()=> Item, item => item.category)
-    items: Item; 
+    @OneToOne( ()=> Item, item => item.id)
+    @JoinColumn({name: 'item_book_id'})
+    item: Item; 
 
-    @OneToOne( ()=> User, user => user.id)
-    student_booked: User; 
+    @ManyToOne( ()=> User, user => user.id)
+    user_booked: User; 
 
 };
 

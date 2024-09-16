@@ -5,8 +5,9 @@ import { api } from '../../api'
 import type { Item } from '../../types';
 import { categories, colors, sizes } from '../../types';
 
+const data = ref({});
 const item = ref({} as Item)
-const todayDate = new Date().toISOString().slice(0,10);
+const user_found = ref('');
 const error = ref<Error>()
 const loading = ref(true)
 const success = ref(false)
@@ -15,8 +16,10 @@ const route = useRoute()
 
 async function bookItem(){
 try {
-    const res = await api.post(`/booking/${route.params.code}`)
-    item.value = res.data.data;
+    const res = await api.post(`/bookings/`,{
+        item_code: route.params.code,
+        user_recovered: "Adeêmi"
+    })
     success.value = true;
   } catch (e) {
     error.value = e as Error
@@ -25,9 +28,9 @@ try {
 
 onMounted(async () => {
   try {
-    console.log("aaa")
     const res = await api.get(`/items/${route.params.code}`)
-    item.value = res.data.data
+    item.value = res.data.data.item
+    user_found.value = res.data.data.user_found
   } catch (e) {
     error.value = e as Error
   } finally {
@@ -39,16 +42,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  
   <div>
         <div class="item-register-form">
 
             <div>
                 <div id="photoInputContainer">
                     <div id="fakePhotoContainer">
-                        <img id="fakePhotoInput">
+                        <img id="fakePhotoInput" v-bind:src="`${item.photo}`">
                     </div>
-                    <label for="photo">Descrição: {{ item.desc }}</label>
+                    <label>Descrição: {{ item.desc }}</label>
                 </div>
             </div>
 
@@ -74,7 +76,7 @@ onMounted(async () => {
 
                 <div class="formButtonsContainer">
                     <form @submit.prevent="bookItem">
-                        <!-- <p>Encontrado por {{item.user_found.name}}</p> -->
+                        <p>Encontrado por {{user_found}}</p>
                         <input value="Agendar resgate" type="submit">
                     </form>
                 </div>
@@ -180,7 +182,6 @@ onMounted(async () => {
 }
 
 #fakePhotoInput{
-    display: none;
     width: 100%;
     object-fit: cover;
 }

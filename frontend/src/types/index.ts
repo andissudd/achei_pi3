@@ -1,7 +1,7 @@
 export type User = {
     id: number
     name: string
-    username: string
+    register: string
     password: string
     email: string
     role: Role
@@ -27,6 +27,17 @@ export type Item = {
     user_recovered: User | null 
     photo: Blob;
 }  
+
+export type Booking = {
+    id: number;
+    state: boolean; 
+    code: string; 
+    date_booked: Date;
+    date_concluded: Date | null; 
+    item: Item; 
+    user_booked: User; 
+};
+
 
 export interface ApplicationError {
     error: {

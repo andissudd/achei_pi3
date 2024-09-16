@@ -1,10 +1,13 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
 import MainPage from '../pages/MainPage.vue';
+import LoginForm from '../pages/LoginPage.vue';
+
 import ItemDetails from '../pages/items/ItemDetails.vue';
 import SearchItems from '../pages/items/SearchItems.vue';
 import CreateItem from '../pages/items/CreateItem.vue';
-import LoginForm from '../pages/LoginPage.vue';
+
+import SearchBooking from '../pages/booking/SearchBooking.vue';
 
 const routes =[
     // main routes
@@ -15,8 +18,8 @@ const routes =[
     {path: '/item/:code', component: ItemDetails, meta: {title: 'Achei!'}},
     {path: '/search', component: SearchItems, meta: {title: 'Achei! Pesquisar'}},
     {path: '/item-register', component: CreateItem, meta: {title: 'Achei! Cadastrar item perdido'}},
-  
     // 
+    {path: '/bookings', component: SearchBooking, meta: {title: 'Achei! Agendamentos'}},
 ]
 
 export const router = createRouter({

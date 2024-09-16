@@ -15,7 +15,6 @@ async function loadItems(){
     try {
     const res = await api.get('/items/active');
     items.value = res.data.data;
-    console.log(items.value)    
   } catch (e) {
     error.value = e as Error
   } finally {

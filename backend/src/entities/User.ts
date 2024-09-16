@@ -23,10 +23,10 @@ export class User {
     @ManyToOne( ()=> Role, role => role.users)
     role!: Role; 
 
-    @OneToMany( () => Item, user=> user.user_recovered)
+    @ManyToOne( () => Item, user=> user.user_recovered)
     recovered_items!: Item[];
 
-    @OneToMany( () => Item, user=> user.user_found)
+    @ManyToOne( () => Item, user=> user.user_found)
     found_items!: Item[];
 
 };
