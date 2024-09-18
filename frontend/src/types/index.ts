@@ -7,7 +7,7 @@ export type User = {
     role: Role
   }
 
-type Role = {
+export  type Role = {
     id: number
     name: string
 }

@@ -3,7 +3,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '../../api'
 import type { Item } from '../../types';
-import { categories, colors, sizes } from '../../types';
+
+import { useUserStore } from '../../store/userStore'
 
 const data = ref({});
 const item = ref({} as Item)
@@ -13,6 +14,7 @@ const loading = ref(true)
 const success = ref(false)
 
 const route = useRoute()    
+const userStore = useUserStore()
 
 async function bookItem(){
 try {
@@ -44,7 +46,6 @@ onMounted(async () => {
 <template>
   <div>
         <div class="item-register-form">
-
             <div>
                 <div id="photoInputContainer">
                     <div id="fakePhotoContainer">
@@ -74,10 +75,11 @@ onMounted(async () => {
                 </div>
 
 
-                <div class="formButtonsContainer">
+                <div class="formButtonsContainer" v-if="userStore.user.id">
                     <form @submit.prevent="bookItem">
                         <p>Encontrado por {{user_found}}</p>
-                        <input value="Agendar resgate" type="submit">
+                        <input value="Agendar resgate"  type="submit">
+                        <p>{{ userStore }}</p>
                     </form>
                 </div>
             </div>

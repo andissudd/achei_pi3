@@ -65,12 +65,7 @@ try {
         desc: desc.value,
         date_found: date.value,
         photo: photoSelected.value
-    }, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        }
-
-    } );
+    });
     item.value = res.data.data;
     success.value = true;
   } catch (e) {

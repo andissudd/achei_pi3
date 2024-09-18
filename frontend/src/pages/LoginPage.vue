@@ -1,28 +1,38 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '../api'
+import { useUserStore } from '../store/userStore'
+
+const register = ref('');
+const password = ref('');
 
 const error = ref<Error>()
 const loading = ref(true)
 const success = ref(false)
 
-async function loginSubmit(){
-    const registerInput = <HTMLInputElement>document.getElementById('register');
-    const passwordInput = <HTMLInputElement>document.getElementById('password');
+const router = useRouter()
+const userStore = useUserStore()
 
-    const register = registerInput.value;
-    const password = passwordInput.value;
-
+async function auth(){
     try {
-    const res = await api.post('/login', {
-        register: register,
-        password: password,
-    });
+        loading.value = true
+        error.value = undefined
         
+        const { data } = await api.post('/login', {
+            register: register.value,
+            password: password.value
+        })
+            
+        const { jwt, user } = data.data
+
+        userStore.authenticaded(user, jwt)
+
+        router.push('/')
   } catch (e) {
     error.value = e as Error
   } finally {
-    window.location.href = "/"
+    loading.value = false
   }
 };
 
@@ -35,13 +45,16 @@ async function loginSubmit(){
             <img src="../assets/images/acenando.png">
 
             <div id="form container">
-                <form id="login-form" @submit="loginSubmit">
+                <div v-if="error">
+                    {{ error }}
+                </div>
+                <form id="login-form" @submit.prevent="auth">
                     <h2>Entrar na minha conta</h2>
                     <!-- <p>Você é um administrador? Clique aqui</p> -->
                     <label for="register">Matrícula:</label><br/>
-                    <input type="text" id="register" name="register" required><br/>
+                    <input type="text" id="register" name="register" v-model="register" required><br/>
                     <label for="password">Senha:</label><br/>
-                    <input type="password" id="password" name="password" required><br>
+                    <input type="password" id="password" name="password" v-model="password" required><br>
                     <a>Esqueci minha senha</a><br/>
 
                     <input type="submit" value="Entrar">

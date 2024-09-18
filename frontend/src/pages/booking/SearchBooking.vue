@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { api } from '../../api'
 
-import type {Booking, Item} from "../../types";
+import { useUserStore } from '../../store/userStore';
+
+import type {Booking, Item, User, Role} from "../../types";
 import {categories, colors, sizes} from "../../types";
+
+const user = ref({
+    role : {
+        id: 0
+    }
+})
+const id = ref<Number>(-1)
+const roles = ref([] as Role[])
 
 const bookings = ref([] as Booking[])
 const error = ref<Error>()
@@ -18,6 +28,11 @@ const bookingToDelete = ref({} as Booking)
 const claimRequest = ref(false)
 const deleteRequest = ref(false)
 const confirmColor = ref("")
+
+const route = useRoute()
+const router = useRouter()
+
+const userStore = useUserStore()
 
 async function loadBookings(){
     try {
@@ -74,7 +89,7 @@ async function confirmClaim(){
 
 async function confirmDelete(){
     try {
-    await api.delete(`/bookings/${bookingToClaim.value.code}`);
+    await api.delete(`/bookings/${bookingToDelete.value.code}`);
         let deleted = bookings.value.findIndex(b=> bookingToDelete.value.code === b.code);
         bookings.value.splice(deleted, 1)
         deleteSuccess.value = true;
@@ -148,7 +163,7 @@ onMounted(async () => {
 
         <div v-if="claimSuccess || deleteSuccess" class="alert alert-success alert-dismissible" role=
         "alert">
-        <h2> {{ claimSuccess ? "Resgate concluído com sucesso!": "Item deletado com sucesso." }} </h2>
+        <h2> {{ claimSuccess ? "Resgate concluído com sucesso!": "Agendamento deletado com sucesso." }} </h2>
             <button @click="closeAlerts" type="button" class="btn-close" aria-label="Close"></button>
         </div>
 

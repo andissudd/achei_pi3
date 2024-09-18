@@ -8,27 +8,27 @@ const router = Router();
 // router.use(authenticationJWT);
 
 //show all items 
-router.get("/active", async (req, res) => {
+router.get("/active", authenticationJWT,async (req, res) => {
   getAllActive(res);
 });
 
 //show item details
-router.get("/:code", async (req, res) => {
+router.get("/:code", authenticationJWT,async (req, res) => {
   getBookingByCode(req, res);
 });
 
 //add a item
-router.post("/", async (req, res) => {
+router.post("/", authenticationJWT,async (req, res) => {
   createBooking(req, res);
 });
 
 //update specific item
-router.put("/:code", async (req, res) => {
+router.put("/:code", authenticationJWT,async (req, res) => {
   updateBooking(req, res);
 });
 
 //delete specific item
-router.delete("/:code", async (req, res) => {
+router.delete("/:code", authenticationJWT,async (req, res) => {
   deleteBooking(req, res);
 });
 

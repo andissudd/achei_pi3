@@ -108,7 +108,7 @@ export async function createItem(req: any, res: any) {
     photo: photo
   };
 
-  console.log(photo); 
+  console.log(name); 
 
   await itemRepository.save(newItem);
   res.status(201).json({

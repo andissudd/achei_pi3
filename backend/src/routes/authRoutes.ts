@@ -7,10 +7,13 @@ import { User } from "../entities/User";
 const router = Router();
 
 router.post("/login", async (req, res) => {
-  const { password, register } = req.body;
-
+  const { register, password } = req.body;
   const userRepository = AppDataSource.getRepository(User);
-  const user = await userRepository.findOneBy({ register });
+  const user = await userRepository.findOne({
+    where: { register: register },
+    relations: ["role"],
+  });
+
 
   if (user && bcrypt.compareSync(password, user.password)) {
     const token = jwt.sign(
@@ -24,18 +27,25 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json({
       data: {
-        token: token,
         user: {
+          id : user.id,
+          name: user.name,
           email: user.email,
-          jwt: token,
-        },
+          register: user.register,
+          role: {
+            id: user.role.id,
+            name: user.role.name,
+          }
+        }
       },
+      jwt: token
     });
+  
   } else {
     res.status(401).json({
       status: 401,
       name: "Authentication Error",
-      message: "Username or password incorrect",
+      message: "Nome de usuário ou senha inválidos",
     });
   }
 });
@@ -43,7 +53,7 @@ router.post("/login", async (req, res) => {
 router.get("/logout", (req, res) => {
   res.status(200).json({
     data: {
-      message: "Logout realized with sucess",
+      message: "Logout realizado com sucesso",
     },
   });
 });

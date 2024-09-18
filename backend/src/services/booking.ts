@@ -123,10 +123,10 @@ export async function deleteBooking(req: any, res: any) {
 
   if (bookingToRemove) {
     console.log(bookingToRemove);
-    // await bookingRepository.remove(bookingToRemove);
-    // res.status(200).json({
-    //   data: bookingToRemove,
-    // });
+    await bookingRepository.remove(bookingToRemove);
+    res.status(200).json({
+      data: bookingToRemove,
+    });
   } else {
     error = "Agendamento não encontrado.";
     res.status(404).json({ error });
