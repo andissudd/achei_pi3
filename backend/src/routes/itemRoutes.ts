@@ -1,7 +1,7 @@
 import Router from "express";
 import { authenticationJWT } from "../middleware/authMiddleware";
 
-import { getAllActive, getItemByCode, createItem, updateItem, deleteItem } from "../services/item";
+import { getAllActive, getItemByCode, createItem, updateItem, deleteItem, getFiltered } from "../services/item";
 
 const router = Router();
 
@@ -11,6 +11,10 @@ const router = Router();
 router.get("/active", async (req, res) => {
   getAllActive(res);
 });
+//filtered query
+router.get("/filter/:filters", async (req, res) => {
+  getFiltered(req, res);
+});
 
 //show item details
 router.get("/:code", async (req, res) => {
@@ -18,17 +22,17 @@ router.get("/:code", async (req, res) => {
 });
 
 //add a item
-router.post("/", async (req, res) => {
+router.post("/", authenticationJWT, async (req, res) => {
   createItem(req, res);
 });
 
 //update specific item
-router.put("/:code", async (req, res) => {
+router.put("/:code",authenticationJWT, async (req, res) => {
   updateItem(req, res);
 });
 
 //delete specific item
-router.delete("/:code", async (req, res) => {
+router.delete("/:code",authenticationJWT, async (req, res) => {
   deleteItem(req, res);
 });
 

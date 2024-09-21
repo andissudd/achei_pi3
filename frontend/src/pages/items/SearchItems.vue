@@ -11,9 +11,38 @@ const error = ref<Error>()
 const loading = ref(true)
 const success = ref(false)
 
+//form data
+const category = ref('');
+const color = ref('');
+const size = ref('');
+
+function getCat(c:string){
+    category.value = c
+}
+function getCol(c:string){
+    color.value = c
+}
+function getSize(s:string){
+    size.value = s
+}
+//
+
 async function loadItems(){
     try {
     const res = await api.get('/items/active');
+    items.value = res.data.data;
+  } catch (e) {
+    error.value = e as Error
+  } finally {
+    loading.value = false
+  }
+};
+
+async function loadSearch(){
+    try {
+    loading.value = true;
+    const res = await api.get(`/items/filter/${category.value},${color.value},${size.value}`);
+    items.value = [];
     items.value = res.data.data;
   } catch (e) {
     error.value = e as Error
@@ -36,11 +65,11 @@ onMounted(async () => {
 <div class="search-page-container">
     <div class="search-aside-container">
         <div class="filter-form-container">
-                <form>
+                <form @submit.prevent="loadSearch">
                     <fieldset>
                         <legend>Categoria</legend>
-                        <div v-for="category in categories">
-                            <input type="radio" name="category" v-bind:id="`${category}`">
+                        <div v-for="category in categories" :key="category">
+                            <input type="radio" name="category" @click="getCat(`${category}`)" v-bind:id="`${category}`">
                             <label v-bind:for="`${category}`">{{category}}</label>
                         </div>
                     </fieldset>
@@ -58,7 +87,7 @@ onMounted(async () => {
                     <fieldset>
                         <legend>Cor</legend>
                         <div v-for="color in colors">
-                            <input type="radio" name="color" v-bind:id="`${color}`">
+                            <input type="radio" name="color" @click="getCol(color)" v-bind:id="`${color}`">
                             <label v-bind:for="`${color}`">{{color}}</label>
                         </div>
                     </fieldset>
@@ -66,7 +95,7 @@ onMounted(async () => {
                     <fieldset>
                         <legend>Tamanho</legend>
                         <div v-for="size in sizes">
-                            <input type="radio" name="size" v-bind:id="`${size}`">
+                            <input type="radio" name="size" @click="getSize(size)" v-bind:id="`${size}`">
                             <label v-bind:for="`${size}`">{{size}}</label>
                         </div>
                     </fieldset>
@@ -110,7 +139,7 @@ onMounted(async () => {
                 <p>Categoria, cor, tamanho</p>
                 </div>
             </a> -->
-            <a v-for="item in items" :key="item.id" v-bind:href="`/item/${ item.code }`" class="card item-card">
+            <a v-if="items.length>0" v-for="item in items" :key="item.id" v-bind:href="`/item/${ item.code }`" class="card item-card">
                 <div class="card-img-container">
                     <img v-bind:src="`${ item.photo}`" v-bind:alt="`${item.name}`">
                 </div>
@@ -119,6 +148,7 @@ onMounted(async () => {
                 <p>{{item.category}}, {{item.color}}, {{item.size}}</p>
                 </div>
             </a>
+            <a v-else>Não há itens cadastrados</a>
 
         </div>
     

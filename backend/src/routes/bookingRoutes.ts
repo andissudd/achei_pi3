@@ -1,7 +1,7 @@
 import Router from "express";
 import { authenticationJWT } from "../middleware/authMiddleware";
 
-import { getAllActive, getBookingByCode, createBooking, updateBooking, deleteBooking } from "../services/booking";
+import { getAllActive, getAlert, getBookingByCode, createBooking, updateBooking, deleteBooking } from "../services/booking";
 
 const router = Router();
 
@@ -10,6 +10,10 @@ const router = Router();
 //show all items 
 router.get("/active", authenticationJWT,async (req, res) => {
   getAllActive(res);
+});
+
+router.get("/alert/:id", authenticationJWT,async (req, res) => {
+  getAlert(req,res);
 });
 
 //show item details

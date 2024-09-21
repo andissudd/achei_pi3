@@ -36,7 +36,11 @@ const userStore = useUserStore()
 
 async function loadBookings(){
     try {
-    const res = await api.get('/bookings/active');
+    const res = await api.get('/bookings/active', {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
+    });
     bookings.value = res.data.data;  
   } catch (e) {
     error.value = e as Error
@@ -75,8 +79,16 @@ function closeAlerts(){
 
 async function confirmClaim(){
     try {
-    await api.put(`/bookings/${bookingToClaim.value.code}`);
-    await api.put(`/items/${bookingToClaim.value.code}`);
+    await api.put(`/bookings/${bookingToClaim.value.code}`, {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
+    });
+    await api.put(`/items/${bookingToClaim.value.code}`, {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
+    });
     let claimed = bookings.value.findIndex(b=> bookingToClaim.value.code === b.code);
     bookings.value.splice(claimed, 1)
     claimSuccess.value = true;
@@ -89,7 +101,11 @@ async function confirmClaim(){
 
 async function confirmDelete(){
     try {
-    await api.delete(`/bookings/${bookingToDelete.value.code}`);
+    await api.delete(`/bookings/${bookingToDelete.value.code}`, {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
+    });
         let deleted = bookings.value.findIndex(b=> bookingToDelete.value.code === b.code);
         bookings.value.splice(deleted, 1)
         deleteSuccess.value = true;
@@ -174,8 +190,11 @@ onMounted(async () => {
         </div>
 
         <div v-else class="booking-grid">
+            <div>
+
+            </div>
             
-            <a v-for="booking in bookings" :key="booking.id" class="card booking-card">
+            <a v-if="bookings.length>0" v-for="booking in bookings" :key="booking.id" class="card booking-card">
                 <div class="item-img">
                     <img v-bind:src="`${booking.item.photo}`">
                 </div>
@@ -191,6 +210,7 @@ onMounted(async () => {
                     <button @click="askToDelete(booking.code)" >Deletar</button>
                 </div>
             </a>
+            <a v-else>Não há agendamentos registrados</a>
 
         </div>
     

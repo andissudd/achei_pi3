@@ -1,10 +1,58 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { api } from './api'
+import { useRouter } from 'vue-router'
+import { useUserStore } from './store/userStore';
+import type {Booking, User} from "./types";
+import { useStore } from 'vuex/types/index.js';
+
+const router = useRouter()
+const userStore = useUserStore()
+
+const booking = ref({} as Booking)
+const error = ref<Error>()
+const loading = ref(true)
+const alert = ref(false)
+
+async function loadAlert(){
+    try {
+    loading.value = true;
+    const res = await api.get(`/bookings/alert/${userStore.user.id}`, {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
+    });
+    booking.value = res.data.data;
+    if (booking.value.user_booked.id == userStore.user.id){
+        alert.value = true;
+    }
+  } catch (e) {
+    error.value = e as Error
+  } finally {
+    loading.value = false
+  }
+};
+
+async function logout(){
+    console.log('foi')
+    try{
+        api.get('/logout')
+        userStore.logout()
+        router.push('/login');
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+onMounted(async () => {
+    loadAlert();
+});
 
 </script>
 
 <template>
 
-<div class="nav-bar-container">
+<div class="nav-bar-container" v-if="!$route.meta.hideNavbar">
         <nav class="nav-bar">
 
                 <ul class="header-links">
@@ -22,13 +70,34 @@
                         </a>
                     </li>
 
+                    <li v-if="userStore.role == 'Admin'">
+                        <a class="header-link" href="/search">Itens</a>
+                    </li>
+
+                    <li v-if="userStore.role == 'Admin'">
+                        <a class="header-link" href="/bookings">Agendamentos</a>
+                    </li>
+
                     <li>
                         <a class="header-link" href="/help">Ajuda</a>
                     </li>
 
-                    <li>
+                    <li v-if="!userStore.user.id">
                         <a class="enter-btn-link" href="/login">Entrar</a>
                     </li>
+                    <li v-else class="session">
+                        <div class="profile"><div v-if="alert" class="alert-ico"></div><img src="https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg"></div>
+                        <div class="session-details">
+                            <p>{{ userStore.user.name }}</p>
+                            <div class="alert" v-if="alert">
+                                <h4>Você tem um agendamento pendente!</h4>
+                                <p>Dirija-se a entrada do campus e informe seus dados no momento do resgate</p>
+                            </div>
+
+                            <a class="" @click="logout">Sair</a>
+                        </div>
+                    </li>
+                    
 
                 </ul>
 
@@ -114,4 +183,66 @@ body{
 .header-icon path {
     fill: var(--text-color);
 }
+
+.session:hover .session-details{
+    display: flex;
+}
+
+
+
+.profile{
+    
+}
+
+
+.profile img{
+    height: 40px;
+    border-radius: 100px;
+    aspect-ratio: 1/1;
+}
+
+.session-details {
+    display: none;
+    box-sizing: border-box;
+    padding: 20px;
+    background-color: whitesmoke;
+    border-radius: 10px;
+    position: absolute;
+    right:0;
+    flex-direction: column;
+}
+
+.session-details p{
+    font-weight: 500;
+}
+
+.session-details a{
+    color: #535353;
+    text-decoration: none;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.alert-ico{
+    position: absolute;
+    top: 15px;
+    background-color: #40dba0;
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+}
+
+.alert{
+    background-color: #40dba0;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+}
+
+.alert p{
+    font-size: 0.8em;
+    font-weight: 400;
+}
+
+
 </style>

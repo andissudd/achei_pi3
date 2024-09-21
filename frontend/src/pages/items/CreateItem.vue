@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '../../api'
-import type { Item } from '../../types';
+import type { Item, User } from '../../types';
 import { categories, colors, sizes } from '../../types';
+import { useUserStore } from '../../store/userStore';
 
+const router = useRouter()
+const userStore = useUserStore()
+//
 const todayDate = new Date().toISOString().slice(0,10);
 //
 const item = ref({} as Item)
@@ -58,6 +63,7 @@ async function createItem(){
 try {
 
     const res = await api.post('/items', {
+        user_register: userStore.register,
         name: name.value,
         category: category.value,
         color: color.value,
@@ -65,6 +71,10 @@ try {
         desc: desc.value,
         date_found: date.value,
         photo: photoSelected.value
+    }, {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
     });
     item.value = res.data.data;
     success.value = true;
@@ -138,7 +148,7 @@ try {
 
                 <div class="formButtonsContainer">
                     <div>
-                        <input value="Cancelar" type="button">
+                        <a href="/"><input value="Cancelar" type="button"></a>
                         <input value="Cadastrar item" type="submit">
                     </div>
                 </div>

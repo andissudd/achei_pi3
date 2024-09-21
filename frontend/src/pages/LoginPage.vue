@@ -24,9 +24,10 @@ async function auth(){
             password: password.value
         })
             
-        const { jwt, user } = data.data
+        const user = data.data.user
+        const jwt = data.data.jwt
 
-        userStore.authenticaded(user, jwt)
+        userStore.authenticated(user, jwt)
 
         router.push('/')
   } catch (e) {

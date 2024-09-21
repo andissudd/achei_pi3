@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { api } from '../api'
+import type { User } from '../types'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '../store/userStore';
 
+const router = useRouter()
+const userStore = useUserStore()
 
 </script>
 
 <template>
   
   <div class="page-container">
+    
     <div class="index-presentation">
         <a href="/" >
             <svg class="presentation-icon" viewBox="0 0 460 131" xmlns="http://www.w3.org/2000/svg">

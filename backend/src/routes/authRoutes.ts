@@ -36,10 +36,9 @@ router.post("/login", async (req, res) => {
             id: user.role.id,
             name: user.role.name,
           }
-        }
-      },
-      jwt: token
-    });
+        },
+        jwt: token
+      }});
   
   } else {
     res.status(401).json({

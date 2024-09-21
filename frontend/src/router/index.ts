@@ -9,19 +9,20 @@ import SearchItems from '../pages/items/SearchItems.vue';
 import CreateItem from '../pages/items/CreateItem.vue';
 import SearchBooking from '../pages/booking/SearchBooking.vue';
 
+
 const routes =[
     // main routes
     {path: '/', name: 'home', component: MainPage, meta: {requiresAuth: false,title: 'Achei!'}},
-    {path: '/login', name: 'Login', component: LoginForm, meta: {requiresAuth: false,title: 'Achei! Login'}},
-    {path: '/login', name: 'Logout', component: LoginForm, meta: {requiresAuth: false,title: 'Achei! Login'}},
-
+    {path: '/login', name: 'Login', component: LoginForm, meta: {requiresAuth: false, hideNavbar: true,title: 'Achei! Login'}},
+    {path: '/logout', name: 'Logout', component: LoginForm, meta: {requiresAuth: false,title: 'Achei! Login'}},
 
     // // Item routes
     {path: '/item/:code', component: ItemDetails, meta: {requiresAuth: false,title: 'Achei!'}},
     {path: '/search', component: SearchItems, meta: {requiresAuth: false,title: 'Achei! Pesquisar'}},
     {path: '/item-register', component: CreateItem, meta: {requiresAuth: true,title: 'Achei! Cadastrar item perdido'}},
-    // 
-    {path: '/bookings', component: SearchBooking, meta: {requiresAuth: true,title: 'Achei! Agendamentos'}},
+
+    // bookings
+    {path: '/bookings', component: SearchBooking, meta: {requiresAuth: true, restricted: true,title: 'Achei! Agendamentos'}},
 ]
 
 export const router = createRouter({
@@ -32,23 +33,18 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   const title = to.meta.title
-  const titleFromParams = to.params.pageTitle;
 
-  if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    return '/login'
+  if( to.meta.requiresAuth && !userStore.isAuthenticated ) {
+    next('/login') 
+  } else {
+    if ( to.meta.restricted && userStore.role !== 'Admin' ) {
+      next('/unauthorized')
+    } else {
+      if (title) {
+        document.title = title.toString()
+      }
+      next()
+    }
+
   }
-  
-  // if( to.meta.requiresAuth && !userStore.isAuthenticated ) {
-  //   next('/login') 
-  // } else {
-  //   if (title) {
-  //     document.title = title.toString()
-  //   }
-  //   if (titleFromParams) {
-  //     document.title = `${titleFromParams} - ${document.title}`;
-  //   }
-  //   next()
-  // }
-
-
 })

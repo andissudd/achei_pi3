@@ -1,30 +1,56 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { api } from '../../api'
 import type { Item } from '../../types';
 
 import { useUserStore } from '../../store/userStore'
 
-const data = ref({});
 const item = ref({} as Item)
 const user_found = ref('');
 const error = ref<Error>()
 const loading = ref(true)
 const success = ref(false)
 
+const deleteRequest = ref(false)
+
 const route = useRoute()    
+const router = useRouter()    
 const userStore = useUserStore()
+
+function deleteToggle(){
+    deleteRequest.value = !deleteRequest.value
+}
 
 async function bookItem(){
 try {
     const res = await api.post(`/bookings/`,{
         item_code: route.params.code,
-        user_recovered: "Adeêmi"
+        user_recovered: userStore.user.register
+    }, {
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
     })
     success.value = true;
   } catch (e) {
     error.value = e as Error
+  }
+};
+
+async function itemDelete(){
+    deleteToggle();
+try {
+    const res = await api.delete(`/items/${route.params.code}`,{
+        headers: {
+        Authorization: `Bearer ${userStore.jwt}`
+      }
+    }, )
+    router.push('/')
+  } catch (e) {
+    error.value = e as Error
+  } finally{
+    
   }
 };
 
@@ -41,11 +67,12 @@ onMounted(async () => {
 })
 
 
+
 </script>
 
 <template>
   <div>
-        <div class="item-register-form">
+        <div class="item-register-form" v-if="item ">
             <div>
                 <div id="photoInputContainer">
                     <div id="fakePhotoContainer">
@@ -78,14 +105,33 @@ onMounted(async () => {
                 <div class="formButtonsContainer" v-if="userStore.user.id">
                     <form @submit.prevent="bookItem">
                         <p>Encontrado por {{user_found}}</p>
+                        <input v-if="userStore.role == 'Admin'" @click="deleteToggle" value="Deletar item"  type="button">
                         <input value="Agendar resgate"  type="submit">
-                        <p>{{ userStore }}</p>
                     </form>
+                </div><div class="formButtonsContainer" v-else>
+                    <a href="/login" >Entrar na minha conta</a>
                 </div>
+
             </div>
 
         </div>
+        <div v-else>
+            <p>Este item não existe...</p>
+        </div>
     </div>
+
+    <div class="modals" v-if="deleteRequest">
+    <div>
+        <form v-if="deleteRequest">
+            <h2>Deletar item</h2>
+            <p>Tem certeza que deseja finalizar o resgate do item: {{ item.name }}</p>
+            
+            <div>
+                <button @click="itemDelete" class="confirm">Deletar</button> <button @click="deleteToggle()">Cancelar</button>
+            </div>  
+        </form>
+    </div>
+</div>
 
 </template>
 
@@ -219,10 +265,52 @@ onMounted(async () => {
 }
 
 .formButtonsContainer input[type="button"] {
+    margin-left: 40%;
     background-color: #D25836;
 }
 
 .formButtonsContainer input[type="submit"] {
     background-color: #2D9C71;
 }
+
+.modals {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modals form{
+    background-color: white;
+    border-radius: 20px;
+    padding: 2em;
+    display: flex;
+    flex-direction: column;
+}
+
+.modals form div{
+    margin-top: 1em;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.modals form div button {
+    padding: 1em;
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.confirm {
+    background-color: #B14D30;
+    color: white;
+}
+
 </style>

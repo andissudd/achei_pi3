@@ -29,6 +29,20 @@ export async function getAllActive(res: any) {
   });
 }
 
+export async function getFiltered(req: any, res: any) {
+
+  const filters = req.params.filters.split(",");
+  const category = filters[0];
+  const color = filters[1];
+  const size = filters[2];
+
+  const itemRepository = AppDataSource.getRepository(Item);
+  const items = await itemRepository.find({ where: { state: true, category: category, color: color, size: size} });
+  return res.status(200).json({
+    data: items,
+  });
+}
+
 export async function getItemByCode(req: any, res: any) {
   const itemRepository = AppDataSource.getRepository(Item);
   const userRepository = AppDataSource.getRepository(User);
@@ -66,19 +80,17 @@ export async function createItem(req: any, res: any) {
   const itemRepository = AppDataSource.getRepository(Item);
   const userRepository = AppDataSource.getRepository(User);
 
+  const { user_register, name, category, color, size, desc, date_found, photo } = req.body;
+  inputValidation(name, category, color, size, desc, photo);
+
   //create new code
   const items = await itemRepository.find();
   const newCode = `item${items.length}`;
   //
 
   // //get user data
-  // const authHeader = req.headers["authorization"];
-  // const token = authHeader && authHeader.split(" ")[1];
-  // const arrayToken = token && token.split(".");
-  // const token1 = arrayToken && JSON.parse(atob(arrayToken[1]));
-  // const userId = token1.userId;
   const userFound = await userRepository.findOne({
-    where: { id: 2 },
+    where: { register: user_register },
     relations: ["role"],
   });
   if (!userFound) {
@@ -88,9 +100,6 @@ export async function createItem(req: any, res: any) {
     return;
   }
   //
-
-  const { name, category, color, size, desc, date_found, photo } = req.body;
-  inputValidation(name, category, color, size, desc, photo);
 
   const newItem = {
     code: newCode,
@@ -104,8 +113,8 @@ export async function createItem(req: any, res: any) {
     date_recovered: null,
     user_found: userFound,
     user_recovered: null,
-    // photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToHq57vBe5Ta9KrwGlM43tT7CeDt0kIPQdgQ&s"
-    photo: photo
+    photo: "https://thumbs.dreamstime.com/b/d-person-using-magnifying-glass-searching-inspecting-concept-exploration-figure-holding-representing-act-321657133.jpg"
+    // photo: photo
   };
 
   console.log(name); 
@@ -160,7 +169,6 @@ export async function deleteItem(req: any, res: any) {
   const itemToRemove = await itemRepository.findOneBy({ code: itemCode });
 
   if (itemToRemove) {
-    console.log(itemToRemove);
     await itemRepository.remove(itemToRemove);
     res.status(200).json({
       data: itemToRemove,

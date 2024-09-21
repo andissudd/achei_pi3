@@ -37,17 +37,29 @@ export async function getBookingByCode(req: any, res: any) {
   }
 }
 
+export async function getAlert(req: any, res: any) {
+  const bookingRepository = AppDataSource.getRepository(Booking);
+  const id = req.params.id
+  const bookings = await bookingRepository.find({
+    where: { state: true }, relations: ['user_booked']
+  });
+
+  bookings.forEach(booking => 
+    booking.user_booked.id = id ? res.status(200).json({data: booking}) : res.status(400).json({ erro: "Agendamento não encontrado." })
+  );
+
+}
+
 export async function createBooking(req: any, res: any) {
   const bookingRepository = AppDataSource.getRepository(Booking);
   const itemRepository = AppDataSource.getRepository(Item);
   const userRepository = AppDataSource.getRepository(User);
 
-  const { item_code, user_name } = req.body;
+  const { item_code, user_recovered } = req.body;
   //
 
-
   const userBooked = await userRepository.findOne({
-    where: { register: "Adeêmi" }
+    where: { register: user_recovered }
   });
 
   if (!userBooked) {
@@ -62,7 +74,6 @@ export async function createBooking(req: any, res: any) {
     where: { code: item_code }
   });
   if (!item) {
-    console.log("deu erro item")
     error = "Item não encontrado.";
     res.status(400).json({ error });
     return;
@@ -81,6 +92,7 @@ export async function createBooking(req: any, res: any) {
   res.status(201).json({
     data: newBooking,
   });
+  
 }
 
 export async function updateBooking(req: any, res: any) {
