@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { User, Item, ApplicationError } from "../types";
+import type {ApplicationError } from "../types";
 
 export function isApplicationError(error: any): error is ApplicationError {
     if(axios.isAxiosError(error)) {

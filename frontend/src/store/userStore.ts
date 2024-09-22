@@ -34,7 +34,6 @@ export const useUserStore = defineStore('user', ()=> {
   }
 
   function logout(){
-
     jwt.value = ""
     user.value = {} as User
     localStorage.clear()

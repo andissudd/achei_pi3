@@ -9,30 +9,6 @@ import { useStore } from 'vuex/types/index.js';
 const router = useRouter()
 const userStore = useUserStore()
 
-const booking = ref({} as Booking)
-const error = ref<Error>()
-const loading = ref(true)
-const alert = ref(false)
-
-async function loadAlert(){
-    try {
-    loading.value = true;
-    const res = await api.get(`/bookings/alert/${userStore.user.id}`, {
-        headers: {
-        Authorization: `Bearer ${userStore.jwt}`
-      }
-    });
-    booking.value = res.data.data;
-    if (booking.value.user_booked.id == userStore.user.id){
-        alert.value = true;
-    }
-  } catch (e) {
-    error.value = e as Error
-  } finally {
-    loading.value = false
-  }
-};
-
 async function logout(){
     console.log('foi')
     try{
@@ -45,7 +21,7 @@ async function logout(){
 }
 
 onMounted(async () => {
-    loadAlert();
+    
 });
 
 </script>
@@ -86,14 +62,9 @@ onMounted(async () => {
                         <a class="enter-btn-link" href="/login">Entrar</a>
                     </li>
                     <li v-else class="session">
-                        <div class="profile"><div v-if="alert" class="alert-ico"></div><img src="https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg"></div>
+                        <div class="profile"><img src="https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg"></div>
                         <div class="session-details">
-                            <p>{{ userStore.user.name }}</p>
-                            <div class="alert" v-if="alert">
-                                <h4>Você tem um agendamento pendente!</h4>
-                                <p>Dirija-se a entrada do campus e informe seus dados no momento do resgate</p>
-                            </div>
-
+                            <p>{{ userStore.user.name }} - {{ userStore.role == 'Admin' ? 'Administrador': 'Aluno' }}</p>
                             <a class="" @click="logout">Sair</a>
                         </div>
                     </li>
@@ -187,13 +158,6 @@ body{
 .session:hover .session-details{
     display: flex;
 }
-
-
-
-.profile{
-    
-}
-
 
 .profile img{
     height: 40px;

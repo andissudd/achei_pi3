@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../../api'
-import type { Item, User } from '../../types';
+import type { Item, User, ApplicationError } from '../../types';
 import { categories, colors, sizes } from '../../types';
 import { useUserStore } from '../../store/userStore';
 

@@ -15,6 +15,9 @@ const success = ref(false)
 const category = ref('');
 const color = ref('');
 const size = ref('');
+const todayDate = new Date().toISOString().slice(0,10);
+const mindate = ref(todayDate)
+const maxdate = ref(todayDate)
 
 function getCat(c:string){
     category.value = c
@@ -77,10 +80,10 @@ onMounted(async () => {
                     <fieldset class="dateField">
                         <legend>Perdido entre</legend>
                         <div>
-                            <input type="date" name="date-start" id="date-start">
+                            <input type="date" v-model="mindate" v-bind:max="todayDate" name="date-start" id="date-start">
                         </div>
                         <div>
-                            <input type="date" name="date-end" id="date-end">
+                            <input type="date" v-model="maxdate" v-bind:max="todayDate" name="date-end" id="date-end">
                         </div>
                     </fieldset>    
 

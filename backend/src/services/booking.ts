@@ -58,40 +58,46 @@ export async function createBooking(req: any, res: any) {
   const { item_code, user_recovered } = req.body;
   //
 
-  const userBooked = await userRepository.findOne({
-    where: { register: user_recovered }
-  });
-
-  if (!userBooked) {
-    console.log("deu erro")
-    error = "Usuário não encontrado.";
+  const checkBookings = await bookingRepository.findOne({where:{ code: item_code}})
+  if (!checkBookings){
+    const userBooked = await userRepository.findOne({
+      where: { register: user_recovered }
+    });
+  
+    if (!userBooked) {
+      console.log("deu erro")
+      error = "Usuário não encontrado.";
+      res.status(400).json({ error });
+      return;
+    }
+    //
+  
+    const item = await itemRepository.findOne({
+      where: { code: item_code }
+    });
+    if (!item) {
+      error = "Item não encontrado.";
+      res.status(400).json({ error });
+      return;
+    }
+  
+    const newBooking = {
+      code: item_code,
+      state: true,
+      date_booked: new Date(),
+      date_concluded: null,
+      item: item,
+      user_booked: userBooked,
+    }; 
+  
+    await bookingRepository.save(newBooking);
+    res.status(201).json({
+      data: newBooking,
+    });
+  } else {
+    error = "Já existe um agendamento pendente para esse item.";
     res.status(400).json({ error });
-    return;
   }
-  //
-
-  const item = await itemRepository.findOne({
-    where: { code: item_code }
-  });
-  if (!item) {
-    error = "Item não encontrado.";
-    res.status(400).json({ error });
-    return;
-  }
-
-  const newBooking = {
-    code: item_code,
-    state: true,
-    date_booked: new Date(),
-    date_concluded: null,
-    item: item,
-    user_booked: userBooked,
-  }; 
-
-  await bookingRepository.save(newBooking);
-  res.status(201).json({
-    data: newBooking,
-  });
   
 }
 
