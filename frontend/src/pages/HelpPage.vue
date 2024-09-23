@@ -21,9 +21,6 @@ import { useRouter } from 'vue-router'
         </div>
     </div>
 
-    
-    cuzinhoaiai
-
 
 </template>
 
