@@ -78,8 +78,12 @@ const userStore = useUserStore()
 }
 
 .presentation-icon{
+    width: 80%;
+    display: block; 
+    margin-left: auto;
+    margin-right: auto; 
     fill: var(--orange-color);
-    height: 10em;
+    height: 120px;
 }
 
 .index-presentation a{
@@ -88,6 +92,7 @@ const userStore = useUserStore()
 }
 
 .index-presentation a h2{
+    font-size: 22px;
     font-weight: 500;
 }
 

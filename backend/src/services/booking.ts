@@ -107,31 +107,22 @@ export async function updateBooking(req: any, res: any) {
 
   const bookingCode = req.params.code;
 
-  console.log("entrou book")
-
   const bookingToUpdate = await bookingRepository.findOne({
     where: { code: bookingCode},
   });
 
-  const userBooked = await userRepository.findOne({
-    where: { register: "Adeêmi"},
-  });
-
-  if (bookingToUpdate && userBooked) {
+  if (bookingToUpdate) {
     const newData = {
       id: bookingToUpdate.id,
       state: false,
       date_concluded: new Date(),
-      user_booked: userBooked
     }
 
     await bookingRepository.save(newData);
       res.status(200).json({
         data: newData,
       });
-
   }
-
 }
 
 export async function deleteBooking(req: any, res: any) {

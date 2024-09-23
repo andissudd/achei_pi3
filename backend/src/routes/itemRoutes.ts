@@ -27,7 +27,7 @@ router.post("/", authenticationJWT, async (req, res) => {
 });
 
 //update specific item
-router.put("/:code",authenticationJWT, async (req, res) => {
+router.put("/:code", async (req, res) => {
   updateItem(req, res);
 });
 

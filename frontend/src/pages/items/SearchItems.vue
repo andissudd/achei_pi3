@@ -144,7 +144,8 @@ onMounted(async () => {
             </a> -->
             <a v-if="items.length>0" v-for="item in items" :key="item.id" v-bind:href="`/item/${ item.code }`" class="card item-card">
                 <div class="card-img-container">
-                    <img v-bind:src="`${ item.photo}`" v-bind:alt="`${item.name}`">
+                    <!-- <img v-bind:src="`${ item.photo}`" v-bind:alt="`${item.name}`"> -->
+                    <img src="../../assets/images/foto.jpg" v-bind:alt="`${item.name}`">
                 </div>
                 <div class="card-infos-container">
                 <p><span>{{item.name}}</span></p>

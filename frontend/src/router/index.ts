@@ -3,6 +3,7 @@ import { useUserStore } from '../store/userStore';
 
 import MainPage from '../pages/MainPage.vue';
 import LoginForm from '../pages/LoginPage.vue';
+import HelpPage from '../pages/HelpPage.vue';
 
 import ItemDetails from '../pages/items/ItemDetails.vue';
 import SearchItems from '../pages/items/SearchItems.vue';
@@ -15,6 +16,7 @@ const routes =[
     {path: '/', name: 'home', component: MainPage, meta: {requiresAuth: false,title: 'Achei!'}},
     {path: '/login', name: 'Login', component: LoginForm, meta: {requiresAuth: false, hideNavbar: true,title: 'Achei! Login'}},
     {path: '/logout', name: 'Logout', component: LoginForm, meta: {requiresAuth: false,title: 'Achei! Login'}},
+    {path: '/help', name: 'Help', component: HelpPage, meta: {requiresAuth: false,title: 'Achei! Ajuda'}},
 
     // // Item routes
     {path: '/item/:code', component: ItemDetails, meta: {requiresAuth: false,title: 'Achei!'}},

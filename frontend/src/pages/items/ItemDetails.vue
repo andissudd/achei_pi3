@@ -76,9 +76,10 @@ onMounted(async () => {
             <div>
                 <div id="photoInputContainer">
                     <div id="fakePhotoContainer">
-                        <img id="fakePhotoInput" v-bind:src="`${item.photo}`">
+                        <!-- <img id="fakePhotoInput" v-bind:src="`${item.photo}`"> -->
+                        <img id="fakePhotoInput" src="../../assets/images/foto.jpg">
                     </div>
-                    <label>Descrição: {{ item.desc }}</label>
+                    <label>Descrição: <br>  {{ item.desc }}</label>
                 </div>
             </div>
 
@@ -95,7 +96,7 @@ onMounted(async () => {
 
                     <h1 for="itemName">{{ item.name }}</h1>
 
-                    <p for="date">Data do encontro: <span>{{ item.date_created }}</span></p>
+                    
                     <p for="category">Categoria: <span>{{ item.category }}</span></p>
                     <p for="color">Cor: <span>{{ item.color }}</span></p>
                     <p for="size">Tamanho: <span>{{ item.size }}</span></p>
@@ -104,9 +105,10 @@ onMounted(async () => {
 
                 <div class="formButtonsContainer" v-if="userStore.user.id">
                     <form @submit.prevent="bookItem">
-                        <p>Encontrado por {{user_found}}</p>
+                        <p for="date">Data do encontro: <span>{{ item.date_created }}</span></p><br>
+                       <br> <p>Encontrado por {{user_found}}</p>
                         <input v-if="userStore.role == 'Admin'" @click="deleteToggle" value="Deletar item"  type="button">
-                        <input value="Agendar resgate"  type="submit">
+                        <input value="Agendar resgate" type="submit">
                     </form>
                 </div><div class="formButtonsContainer" v-else>
                     <a href="/login" >Entrar na minha conta</a>
@@ -141,34 +143,51 @@ onMounted(async () => {
 }
 
 .item-register-form{
+    margin-top: 20px;
     display: flex;
     padding: 30px 20px; 
     box-sizing: border-box;
     overflow: hidden;
 }
-
-.infos-container{
-    flex: 9;
-    padding: 10px 0px;
-    box-sizing: border-box;
-    background-color: w
+.item-register-form label{
+    text-decoration: none;
+    margin-left: 20px;
+    display: flex;
+    align-self: flex-start;
 }
-
+.infos-container{
+    border-radius: 10px;
+    background-color: white;
+    margin-top: 20px;
+    flex: 9;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.infos-container h1{
+    margin-bottom: 10px;
+}
+.infos-container p{
+    margin-bottom: 09px;
+}
 .item-register-form >div:first-child {
+    
     width: 40%;
 }
 
 .item-register-form > div {
+    
     width: 50%;
 }
 
 .item-register-form label{
+    
     display: block;
     font-weight: 500;
     margin-top: 15px;
 }
 
 .item-register-form input[type="text"], .item-register-form input[type="date"], .item-register-form textarea{
+   
     width: 100%;
     background-color: whitesmoke;
     padding: 12px 20px;
@@ -181,6 +200,7 @@ onMounted(async () => {
 }
 
 .selectInputsContainer{
+    
     box-sizing: border-box;
     display: flex;
     width: 80%;
@@ -199,6 +219,7 @@ onMounted(async () => {
 }
 
 #photoInputContainer{
+    
     background-color: white;
     flex-direction: column;
     width: 80%;
@@ -239,6 +260,8 @@ onMounted(async () => {
 }
 
 .formButtonsContainer{
+    margin-top: 20px;
+
     flex: 1;
     display: flex;
     align-items: flex-end;
@@ -248,12 +271,15 @@ onMounted(async () => {
 }
 
 .formButtonsContainer > form{
+    margin-top: 20px;
+
     width: 100%;
     display: flex;
     justify-content: space-between;
 }
 
 .formButtonsContainer input[type="button"], .formButtonsContainer input[type="submit"] {
+    
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -265,15 +291,18 @@ onMounted(async () => {
 }
 
 .formButtonsContainer input[type="button"] {
+    
     margin-left: 40%;
     background-color: #D25836;
 }
 
 .formButtonsContainer input[type="submit"] {
+    
     background-color: #2D9C71;
 }
 
 .modals {
+    
     background-color: rgba(0, 0, 0, 0.5);
     position: absolute;
     top: 0;
@@ -294,6 +323,7 @@ onMounted(async () => {
 }
 
 .modals form div{
+    
     margin-top: 1em;
     width: 100%;
     display: flex;
@@ -301,6 +331,7 @@ onMounted(async () => {
 }
 
 .modals form div button {
+    
     padding: 1em;
     border: none;
     border-radius: 10px;
@@ -309,6 +340,7 @@ onMounted(async () => {
 }
 
 .confirm {
+    
     background-color: #B14D30;
     color: white;
 }
