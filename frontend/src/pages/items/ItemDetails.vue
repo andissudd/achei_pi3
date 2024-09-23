@@ -84,13 +84,13 @@ onMounted(async () => {
             </div>
 
             <div>
-                <div v-if="success" class="alert alert-danger alert-dismissible" role="alert">
+                <div v-if="success" class="alert success" role="alert">
                     <h2>Agendamento confirmado!</h2>
                     <p></p>
                 </div>
-                <div v-if="error" class="alert alert-danger alert-dismissible" role="alert">
+                <div v-if="error" class="alert danger" role="alert">
                     {{ error.message }}
-                    <button @click="error=undefined" type="button" class="btn-close" aria-label="Close"></button>
+                    <button @click="error=undefined" type="button" class="btn-close" aria-label="Close">x</button>
                 </div>
                 <div class="infos-container">
 
@@ -345,4 +345,25 @@ onMounted(async () => {
     color: white;
 }
 
+.alert{
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.success{
+    background-color: #3de4a4;
+    border: 1px solid #2D9C71;
+    color: white;
+}
+
+.danger{
+    background-color: #fd504d;
+    border: 1px solid #D25836;
+    color: white;
+}
+.danger button{
+    color: white;
+    background-color: #D25836;
+    border: none;
+}
 </style>

@@ -101,7 +101,7 @@ try {
             </div>
 
             <div>
-                <div v-if="success" class="alert alert-danger alert-dismissible" role="alert">
+                <div v-if="success" class="alert success" role="alert">
                     Item cadastrado
                 </div>
                 <div v-if="error" class="alert alert-danger alert-dismissible" role="alert">
@@ -287,5 +287,13 @@ body{
     background-color: #2D9C71;
 }
 
+.alert{
+    padding: 10px;
+    border-radius: 10px;
+}
 
+.success{
+    background-color: #3de4a4;
+    border: 1px solid #2D9C71;
+}
 </style>
